@@ -1,0 +1,245 @@
+/* === MODO OSCURO ELEGANTE === */  
+body {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
+.container {
+  max-width: 100%;
+  width: 100%;
+  margin: 40px auto;
+  background: #1c1c1c;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 30px;
+}
+
+/* === TÍTULO === */
+h1 {
+  text-align: center;
+  color: #00ff7f;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+/* === BUSCADOR Y BOTÓN EN LA MISMA LÍNEA === */
+.buscador {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px; /* ← volvemos a la separación ideal */
+  margin-bottom: 25px;
+  flex-wrap: nowrap;
+}
+
+/* === INPUT DEL BUSCADOR === */
+.buscador input[type="text"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #2a2a2a;
+  color: #eee;
+  outline: none;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.buscador input[type="text"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #2a2a2a;
+  color: #eee;
+  outline: none;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  /* === sombra verde fija === */
+  border-color: #00ff7f;
+  box-shadow: 0 0 6px #00ff7f;
+}
+
+
+/* === BOTÓN “VER SELECCIONADOS” AJUSTADO === */
+.buscador .btn-seleccion {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #00bfa5;
+  color: #fff;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s;
+  min-width: 130px;
+  height: 42px; /* visualmente igual al input */
+  flex-shrink: 0;
+}
+
+.buscador .btn-seleccion:hover {
+  background: #00ff7f;
+  color: #111;
+  transform: scale(1.05);
+}
+
+
+/* === FILAS === */
+tbody tr {
+  background-color: #1e1e1e;
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #333;
+  color: #ddd;
+}
+
+
+
+
+/* === MODAL === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  background-color: #1c1c1c;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  color: #eee;
+  box-shadow: 0 0 20px rgba(0, 255, 127, 0.3);
+}
+
+.close {
+  color: #00ff7f;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #fff;
+}
+
+/* === SCROLL PERSONALIZADO === */
+.table-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background-color: #00ff7f;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background-color: #1e1e1e;
+}
+
+/* === CELDAS SELECCIONADAS === */
+tr.seleccionado {
+  background-color: rgba(0, 255, 127, 0.15) !important;
+  border-left: 4px solid #00ff7f;
+}
+
+/* === COLUMNA PRODUCTOS EN UNA SOLA LÍNEA === */
+td.productos-col {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 450px;
+}
+
+/* === AJUSTES RESPONSIVE === */
+@media (max-width: 768px) {
+  .buscador {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .buscador input[type="text"],
+  .buscador .btn-seleccion {
+    width: 100%;
+    max-width: none;
+  }
+
+  .buscador .btn-seleccion {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+}
+
+
+.table-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  background-color: #000;
+  color: #40ffb7;
+  font-weight: 600;
+  border-bottom: 2px solid #00ff7f;
+  z-index: 10;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #00ff7f;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background-color: #1e1e1e;
+}
+

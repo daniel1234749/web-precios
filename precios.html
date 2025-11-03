@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📦 Lista de Precios – Mayorista Emanuel</title>
+  <link rel="stylesheet" href="precios.css" />
+  <link rel="stylesheet" href="tabla.css" />
+ 
+</head>
+<label class="switch">
+  🌙 <input type="checkbox" id="theme-switch"> ☀️
+</label>
+
+<body>
+  <div class="container">
+    
+    <h1>📊 Stock y ventas</h1> 
+    
+
+    <div class="buscador">
+      <input type="text" id="buscador" placeholder="🔍 Escribí código o producto y presioná ENTER..." />
+       <button id="btnMostrar" class="btn-seleccion">🛒 Ver seleccionados</button>
+    </div>
+
+    <!-- 🔹 TABLA PRINCIPAL (con scroll y encabezado fijo) -->
+    <div class="table-container">
+      <table id="tablaPrincipal">
+        <thead id="encabezado"></thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+  <!-- 🔹 MODAL -->
+  <div id="modalSeleccion" class="modal">
+    <div class="modal-content">
+      <h2>🧾 Productos seleccionados</h2>
+      <div class="modal-body">
+        <div id="listaSeleccion"></div>
+      </div>
+      <div class="modal-buttons">
+        <button id="btnVaciar" class="btn btn-warning">🧹 Vaciar</button>
+        <button id="btnExportar" class="btn btn-success">📤 Exportar</button>
+        <button id="btnCerrar" class="btn btn-danger">❌ Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="precios.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+</body>
+</html>

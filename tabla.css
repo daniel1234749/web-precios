@@ -1,0 +1,88 @@
+/* Estilos para el contenedor de scroll y encabezado fijo */
+.table-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Encabezado: Asegura el color de fondo base */
+.table-container thead {
+    background: #000;
+    color: #40ffb7; 
+    font-weight: 600;
+}
+
+/* Celdas del encabezado: APLICAMOS EL STICKY */
+.table-container thead th {
+    position: sticky; /* Fija el elemento */
+    top: 0; /* Lo fija en la parte superior del contenedor */
+    background-color: #000; /* Fondo para que no se vean las filas debajo */
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #00ff7f;
+    text-transform: none; 
+    z-index: 10; /* Asegura que esté por encima de las filas */
+    color: #40ffb7;
+    font-weight: 600;
+}
+
+/* Solo la primera letra en mayúscula */
+.table-container thead th::first-letter {
+    text-transform: uppercase;
+}
+
+/* Estilos de scroll personalizado */
+.table-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #00ff7f;
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background-color: #1e1e1e;
+}
+
+/* Estilos de las filas y celdas (opcionalmente puedes dejarlos aquí) */
+tbody tr {
+    background-color: #1e1e1e;
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #333;
+    color: #ddd;
+}
+/* ... (puedes mover más estilos específicos de tabla si lo deseas) ... */
+.tabla-modal {
+  width: 100%; /* toma el ancho máximo del modal */
+  max-width: 100%; /* evita que se desborde */
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block; /* permite scroll horizontal si hay muchas columnas */
+}
+
+.tabla-modal thead th,
+.tabla-modal tbody td {
+  padding: 10px 12px;
+  border: 1px solid #333;
+  text-align: left;
+  white-space: nowrap; /* evita que el texto se corte en varias líneas */
+}
+
+.modal-body {
+  overflow-x: auto; /* permite scroll horizontal dentro del modal si es necesario */
+}
