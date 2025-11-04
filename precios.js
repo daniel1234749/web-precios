@@ -59,7 +59,7 @@ const btnVaciar = document.getElementById("btnVaciar");
 const btnExportar = document.getElementById("btnExportar");
 
 // ---------- CARGA ----------
-async function cargarDatos() {
+/*async function cargarDatos() {
   try {
     const res = await fetch("precios.json");
     if (!res.ok) throw new Error("No se pudo cargar precios.json");
@@ -72,11 +72,101 @@ async function cargarDatos() {
     tbodyEl.innerHTML = "<tr><td style='text-align:center'>Verificá si el archivo precios.json está en la misma carpeta o abrí con Live Server</td></tr>";
   }
 }
+cargarDatos();*/
+// ---------- CARGA DESDE FIRESTORE ----------
+async function cargarDatos() {
+  try {
+    // Importar módulos dinámicamente (compatible con navegador)
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDb1kRaogv6dORt5tF_9rc6anRka1f312k",
+      authDomain: "web-precios.firebaseapp.com",
+      projectId: "web-precios",
+      storageBucket: "web-precios.firebasestorage.app",
+      messagingSenderId: "743488314251",
+      appId: "1:743488314251:web:146464f971bf9a13f1ad8e"
+    };
+
+    // Inicializar Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    console.log("📡 Cargando productos desde Firestore...");
+    const snapshot = await getDocs(collection(db, "productos"));
+    datosOriginales = snapshot.docs.map(doc => doc.data());
+    console.log(`✅ ${datosOriginales.length} productos cargados desde Firestore.`);
+
+    renderTabla(datosOriginales);
+  } catch (err) {
+    console.error("❌ Error al cargar datos de Firestore:", err);
+    theadEl.innerHTML = "<tr><th style='color:red'>⚠️ Error cargando Firestore</th></tr>";
+    tbodyEl.innerHTML = "<tr><td style='text-align:center'>Revisá tu configuración de Firebase o la colección 'productos'</td></tr>";
+  }
+}
+
+cargarDatos();
+// ---------- CARGA DESDE FIRESTORE ----------
+async function cargarDatos() {
+  try {
+    // Importar módulos dinámicamente (compatible con navegador)
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDb1kRaogv6dORt5tF_9rc6anRka1f312k",
+      authDomain: "web-precios.firebaseapp.com",
+      projectId: "web-precios",
+      storageBucket: "web-precios.firebasestorage.app",
+      messagingSenderId: "743488314251",
+      appId: "1:743488314251:web:146464f971bf9a13f1ad8e"
+    };
+
+    // Inicializar Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    console.log("📡 Cargando productos desde Firestore...");
+    const snapshot = await getDocs(collection(db, "productos"));
+    datosOriginales = snapshot.docs.map(doc => doc.data());
+    console.log(`✅ ${datosOriginales.length} productos cargados desde Firestore.`);
+
+    renderTabla(datosOriginales);
+  } catch (err) {
+    console.error("❌ Error al cargar datos de Firestore:", err);
+    theadEl.innerHTML = "<tr><th style='color:red'>⚠️ Error cargando Firestore</th></tr>";
+    tbodyEl.innerHTML = "<tr><td style='text-align:center'>Revisá tu configuración de Firebase o la colección 'productos'</td></tr>";
+  }
+}
+
 cargarDatos();
 
+
+
+// ---------- RENDER TABLA ----------
 // ---------- RENDER TABLA ----------
 // Columnas de ventas (alias ya normalizados)
 const columnasVentas = ["vtafair", "vtaburza", "vtakorn", "vtatucu"].map(lookupAliasForColumn);
+
+// Orden deseado de columnas
+const ordenColumnas = [
+  "cod",
+  "productos",
+  "uxb",
+  "vtafair",
+  "vtaburza",
+  "vtakorn",
+  "vtatucu",
+  "fair",
+  "burza",
+  "korn",
+  "tucu",
+  "cdistrib",
+  "precios"
+];
 
 function renderTabla(data) {
   theadEl.innerHTML = "";
@@ -93,14 +183,28 @@ function renderTabla(data) {
     return;
   }
 
-  const columnas = Object.keys(data[0]);
+  // Detectar todas las claves disponibles en el dataset
+  const todasClaves = Object.keys(data[0]);
 
+  // Forzar el orden de columnas según la lista deseada, pero solo si existen
+  const columnas = ordenColumnas.filter(c =>
+    todasClaves.some(k => normalizarClave(k) === normalizarClave(c))
+  );
+
+  // Agregar cualquier campo extra no previsto (para evitar que se pierdan)
+  todasClaves.forEach(k => {
+    if (!columnas.some(c => normalizarClave(c) === normalizarClave(k))) {
+      columnas.push(k);
+    }
+  });
+
+  // Crear encabezado
   const trHead = document.createElement("tr");
   columnas.forEach((colName) => {
     const th = document.createElement("th");
     th.textContent = lookupAliasForColumn(colName);
     const norm = normalizarClave(colName);
-    if (["producto","productos","descripcion"].includes(norm)) th.classList.add("col-productos");
+    if (["producto", "productos", "descripcion"].includes(norm)) th.classList.add("col-productos");
     trHead.appendChild(th);
   });
   const thSel = document.createElement("th");
@@ -108,34 +212,38 @@ function renderTabla(data) {
   trHead.appendChild(thSel);
   theadEl.appendChild(trHead);
 
+  // Crear filas
   data.forEach((row, rowIndex) => {
     const tr = document.createElement("tr");
     columnas.forEach((colName) => {
-    const td = document.createElement("td");
-    const val = row[colName] ?? "";
-    td.textContent = val;
-    const norm = normalizarClave(colName);
+      const td = document.createElement("td");
+      const val = row[colName] ?? "";
+      td.textContent = val;
+      const norm = normalizarClave(colName);
 
-    // Color condicional solo para columnas numéricas
-    const colAlias = lookupAliasForColumn(colName);
-    const numVal = parseFloat(val);
-    if (!isNaN(numVal)) {
+      // Color condicional solo para columnas numéricas
+      const colAlias = lookupAliasForColumn(colName);
+      const numVal = parseFloat(val);
+      if (!isNaN(numVal)) {
         if (numVal <= 0) td.style.color = "red";
-        else if (columnasVentas.includes(colAlias) && numVal > 0) td.style.color = "#00ff7f"; // verde
-    }
+        else if (columnasVentas.includes(colAlias) && numVal > 0)
+          td.style.color = "#00ff7f"; // verde
+      }
 
-    if (["producto","productos","descripcion"].includes(norm)) td.classList.add("productos-col");
-    tr.appendChild(td);
-});
+      if (["producto", "productos", "descripcion"].includes(norm))
+        td.classList.add("productos-col");
 
+      tr.appendChild(td);
+    });
 
+    // Botón "Elegir"
     const tdBtn = document.createElement("td");
     const btn = document.createElement("button");
     btn.className = "btn-elegir";
 
-    const id = getFirstField(row, ["CODIGOS","codigos","codigo","cod","codigo_art"]) || `fila-${rowIndex}`;
-    const isSel = seleccionados.some(s => {
-      const sId = getFirstField(s, ["CODIGOS","codigos","codigo","cod","codigo_art"]);
+    const id = getFirstField(row, ["CODIGOS", "codigos", "codigo", "cod", "codigo_art"]) || `fila-${rowIndex}`;
+    const isSel = seleccionados.some((s) => {
+      const sId = getFirstField(s, ["CODIGOS", "codigos", "codigo", "cod", "codigo_art"]);
       return normalizarClave(sId) === normalizarClave(id);
     });
 
@@ -155,8 +263,36 @@ function renderTabla(data) {
     tr.appendChild(tdBtn);
     tbodyEl.appendChild(tr);
   });
+
   aplicarFormatoStock();
 }
+
+function aplicarFormatoStock() {
+  const columnasStock = ["fair", "burza", "korn", "tucu"].map(lookupAliasForColumn);
+
+  const filas = tbodyEl.querySelectorAll("tr");
+  filas.forEach((tr) => {
+    const celdas = tr.children;
+    columnasStock.forEach((colAlias) => {
+      const idx = Array.from(theadEl.querySelectorAll("th")).findIndex(
+        (th) => th.textContent === colAlias
+      );
+      if (idx >= 0) {
+        const td = celdas[idx];
+        const val = parseFloat(td.textContent) || 0;
+        if (val < 0) {
+          td.style.backgroundColor = "red";
+          td.style.color = "white";
+        } else {
+          td.style.backgroundColor = "";
+          td.style.color = "#ddd"; // color normal de tabla oscura
+        }
+      }
+    });
+  });
+}
+
+/*hasta aqui*/
 function aplicarFormatoStock() {
   const columnasStock = ["fair", "burza", "korn", "tucu"].map(lookupAliasForColumn);
 
@@ -475,3 +611,22 @@ themeToggle.addEventListener("change", () => {
   localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
 });
 
+/*import { getFirestore, collection, getDocs } from "firebase/firestore";
+
+// Inicializamos Firestore
+const db = getFirestore(app);
+
+// Función para cargar productos desde Firestore
+async function cargarDatos() {
+  try {
+    const snapshot = await getDocs(collection(db, "productos"));
+    datosOriginales = snapshot.docs.map(doc => doc.data());
+    renderTabla(datosOriginales);
+  } catch (err) {
+    console.error("Error cargando Firestore:", err);
+    theadEl.innerHTML = "<tr><th style='color:red'>⚠️ Error cargando Firestore</th></tr>";
+    tbodyEl.innerHTML = "<tr><td style='text-align:center'>Revisá tu configuración de Firebase y la colección 'productos'</td></tr>";
+  }
+}
+
+cargarDatos();*/
