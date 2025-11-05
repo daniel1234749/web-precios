@@ -339,12 +339,21 @@ function mostrarModal() {
     const btnEliminar = document.createElement("button");
     btnEliminar.textContent = "❌";
     btnEliminar.className = "btn-eliminar";
-    btnEliminar.addEventListener("click", () => {
-      seleccionados.splice(index, 1);
-      localStorage.setItem("seleccionados", JSON.stringify(seleccionados));
-      mostrarModal();
-      renderTabla(datosOriginales);
-    });
+    btnEliminar.addEventListener("click", (ev) => {
+  ev.stopPropagation(); // evita conflictos con clicks
+  seleccionados.splice(index, 1);
+  localStorage.setItem("seleccionados", JSON.stringify(seleccionados));
+
+  // ✅ Elimina la fila directamente sin redibujar toda la tabla
+  tr.remove();
+
+  // ✅ Si ya no quedan seleccionados, mostramos un mensaje breve
+  if (seleccionados.length === 0) {
+    listaSeleccion.innerHTML = "<p>No hay productos seleccionados.</p>";
+  }
+});
+
+
     tdEliminar.appendChild(btnEliminar);
     tr.appendChild(tdEliminar);
 
@@ -407,25 +416,27 @@ btnVaciar && btnVaciar.addEventListener("click", () => {
   if (!confirm("¿Estás seguro que querés vaciar toda la selección?")) return;
   seleccionados = [];
   localStorage.setItem("seleccionados", JSON.stringify(seleccionados));
-  mostrarModal();
-  renderTabla(datosOriginales);
+  listaSeleccion.innerHTML = "<p>No hay productos seleccionados.</p>"; // más rápido
 });
+
 
 // ---------- BUSCADOR ----------
 const buscador = document.getElementById("buscador");
 if (buscador) {
   buscador.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      const term = normalizarClave(buscador.value);
-      if (!term) return renderTabla(datosOriginales);
-      const palabras = term.split(/\s+/).filter(Boolean);
-      const filtrados = datosOriginales.filter(item => {
-        const codigo = normalizarClave(getFirstField(item, ["CODIGOS","codigos","codigo","cod","codigo_art"]) || "");
-        const producto = normalizarClave(getFirstField(item, ["PRODUCTOS","productos","producto","descripcion"]) || "");
-        return palabras.every(p => codigo.includes(p) || producto.includes(p));
-      });
-      renderTabla(filtrados);
-    }
+   if (e.key === "Enter") {
+  const term = normalizarClave(buscador.value);
+  if (!term) return; // no hace nada si está vacío
+
+  const palabras = term.split(/\s+/).filter(Boolean);
+  const filtrados = datosOriginales.filter(item => {
+    const codigo = normalizarClave(getFirstField(item, ["CODIGOS","codigos","codigo","cod","codigo_art"]) || "");
+    const producto = normalizarClave(getFirstField(item, ["PRODUCTOS","productos","producto","descripcion"]) || "");
+    return palabras.every(p => codigo.includes(p) || producto.includes(p));
+  });
+  renderTabla(filtrados);
+}
+
   });
 }
 
