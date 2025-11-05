@@ -175,8 +175,19 @@ function renderTabla(data) {
     columnasReales.forEach(colKey => {
       const td = document.createElement("td");
       const val = row[colKey] ?? "";
-      td.textContent = val;
-      const colAlias = lookupAliasForColumn(colKey);
+const colAlias = lookupAliasForColumn(colKey);
+
+// 🔹 Si es la columna de precios, aplicar formato en pesos argentinos
+if (colAlias === "precios") {
+  const num = parseFloat(String(val).replace(",", "."));
+  td.textContent = !isNaN(num)
+    ? num.toLocaleString("es-AR", { style: "currency", currency: "ARS" })
+    : val;
+} else {
+  td.textContent = val;
+}
+
+     
       const numVal = parseFloat(String(val).replace(",", "."));
       if (!isNaN(numVal)) {
         if (numVal <= 0) td.style.color = "red";
