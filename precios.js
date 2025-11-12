@@ -220,8 +220,58 @@ if (colAlias === "precios") {
     tr.appendChild(tdBtn);
     tbodyEl.appendChild(tr);
   });
+  // === Fila de Totales ===
+  // === Fila de Totales ===
+const totales = {};
+const columnasNumericas = ["vtafair","vtaburza","vtakorn","vtatucu","fair","burza","korn","tucu","cdistrib"];
+const columnasNumericasReales = columnasNumericas
+  .map(a => resolveKeyForAlias(a, data))
+  .filter(Boolean);
+
+columnasNumericasReales.forEach(col => {
+  const suma = data.reduce((acc, r) => acc + (parseFloat(r[col]) || 0), 0);
+  totales[col] = parseFloat(suma.toFixed(2));
+});
+
+const trTotal = document.createElement("tr");
+trTotal.style.fontWeight = "bold";
+trTotal.style.backgroundColor = "#1a1a1a"; // fondo oscuro elegante
+
+columnasReales.forEach(colKey => {
+  const td = document.createElement("td");
+  const colAlias = lookupAliasForColumn(colKey);
+
+  if (colAlias === "productos") {
+    td.textContent = "Totales";
+  } else if (columnasNumericasReales.includes(colKey)) {
+    td.textContent = totales[colKey].toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    td.style.color = "#ffd700"; // 🔹 dorado brillante
+  } else if (colAlias === "precios") {
+    const totalPrecio = data.reduce((acc, r) => acc + (parseFloat(r[colKey]) || 0), 0);
+    td.textContent = totalPrecio.toLocaleString("es-AR", {
+      style: "currency",
+      currency: "ARS"
+    });
+    td.style.color = "#ffd700"; // 🔹 dorado también en precios
+  } else {
+    td.textContent = "";
+  }
+
+  trTotal.appendChild(td);
+});
+
+const tdFinal = document.createElement("td");
+tdFinal.textContent = "";
+trTotal.appendChild(tdFinal);
+tbodyEl.appendChild(trTotal);
+
+
 
   aplicarFormatoStock();
+  
 }
 
 // ---------- FORMATO STOCK ----------
@@ -405,8 +455,12 @@ btnExportar && btnExportar.addEventListener("click", () => {
         const precioProv = parseFloat(String(p.precioProveedor || 0).replace(",", ".")) || 0;
         obj[lookupAliasForColumn(k)] = (precioVenta > 0 && !isNaN(precioProv)) ? ((precioVenta - precioProv)/precioVenta*100).toFixed(2) + " %" : "";
       } else if (k === "precioProveedor") {
-        obj[lookupAliasForColumn(k)] = p.precioProveedor ?? "";
-      } else {
+  const precioProvNum = parseFloat(String(p.precioProveedor).replace(",", ".")) || 0;
+  obj[lookupAliasForColumn(k)] = !isNaN(precioProvNum)
+    ? precioProvNum.toLocaleString("es-AR", { style: "currency", currency: "ARS" })
+    : p.precioProveedor ?? "";
+}
+ else {
         obj[lookupAliasForColumn(k)] = p[k] ?? "";
       }
     }
