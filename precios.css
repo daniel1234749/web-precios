@@ -243,3 +243,7 @@ td.productos-col {
   background-color: #1e1e1e;
 }
 
+.table-container thead th {
+    font-size: 0.9rem; /* antes 1rem aprox */
+    padding: 8px 10px; /* un poco menos de espacio */
+}
