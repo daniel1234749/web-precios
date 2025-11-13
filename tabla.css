@@ -86,3 +86,16 @@ td {
 .modal-body {
   overflow-x: auto; /* permite scroll horizontal dentro del modal si es necesario */
 }
+
+
+/* Contenedor de tabla con scroll horizontal */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Para evitar que las columnas se deformen */
+.table-container table {
+  min-width: 1100px; /* o ajustá según la cantidad de columnas */
+  border-collapse: collapse;
+}

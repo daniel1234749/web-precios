@@ -153,23 +153,53 @@ function renderTabla(data) {
   });
 
   // Crear encabezado usando alias amigables (mostramos nombres amigables)
-  const trHead = document.createElement("tr");
-  columnasReales.forEach(colKey => {
-    const th = document.createElement("th");
-    // Mostramos la etiqueta amigable: si existe un alias conocido lo usamos, si no, usamos la clave
-    const label = lookupAliasForColumn(colKey);
-    th.textContent = label;
-    if (["producto", "productos", "descripcion"].includes(normalizarClave(colKey))) {
-      th.classList.add("col-productos");
-    }
-    trHead.appendChild(th);
-  });
-  const thSel = document.createElement("th");
-  thSel.textContent = "Elegir";
-  trHead.appendChild(thSel);
-  theadEl.appendChild(trHead);
+  // Crear encabezado usando alias amigables (mostramos nombres amigables)
+const trHead = document.createElement("tr");
+columnasReales.forEach(colKey => {
+  const th = document.createElement("th");
+  let label = lookupAliasForColumn(colKey);
+
+  // 🪄 Renombrar encabezado de TotalVentas
+  if (label.toLowerCase() === "totalventas") {
+    label = "Tot.Vtas";
+  }
+
+  th.textContent = label;
+
+  if (["producto", "productos", "descripcion"].includes(normalizarClave(colKey))) {
+    th.classList.add("col-productos");
+  }
+
+  trHead.appendChild(th);
+});
+const thSel = document.createElement("th");
+thSel.textContent = "Elegir";
+trHead.appendChild(thSel);
+theadEl.appendChild(trHead);
+
 
   // Filas (NO mostramos precioProveedor en la tabla principal)
+  // === ORDENAR PRODUCTOS POR TOTAL DE VENTAS ===
+const columnasVentas = ["vtafair", "vtaburza", "vtakorn", "vtatucu"];
+
+// Buscamos los nombres reales de las columnas (por si usan alias)
+const columnasVentasReales = columnasVentas
+  .map(a => resolveKeyForAlias(a, data))
+  .filter(Boolean);
+
+// Calculamos la suma total de ventas por producto
+data.forEach(item => {
+  let totalVentas = 0;
+  columnasVentasReales.forEach(col => {
+    totalVentas += parseFloat(item[col]) || 0;
+  });
+  item.totalVentas = parseFloat(totalVentas.toFixed(2));
+
+});
+
+// Ordenamos de mayor a menor
+data.sort((a, b) => b.totalVentas - a.totalVentas);
+
   data.forEach((row, rowIndex) => {
     const tr = document.createElement("tr");
     columnasReales.forEach(colKey => {
@@ -191,7 +221,7 @@ if (colAlias === "precios") {
       const numVal = parseFloat(String(val).replace(",", "."));
       if (!isNaN(numVal)) {
         if (numVal <= 0) td.style.color = "red";
-        else if (columnasVentas.includes(colAlias) && numVal > 0) td.style.color = "#00ff7f";
+       else if (columnasVentasReales.includes(colKey) && numVal > 0) td.style.color = "#00ff7f";
       }
       if (["producto", "productos", "descripcion"].includes(normalizarClave(colKey))) td.classList.add("productos-col");
       tr.appendChild(td);
